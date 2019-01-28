@@ -4,6 +4,7 @@ export default class Asset extends React.Component{
 
   constructor(props){
     super(props)
+
     this.state = {
       selected: false
     }

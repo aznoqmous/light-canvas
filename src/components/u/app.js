@@ -71,7 +71,7 @@ export default class App extends React.Component{
   }
   handleExportCanvas(index){
     let canvas = this.canvases[index];
-
+    console.log(canvas);
   }
 
   createAsset(file){
@@ -85,12 +85,13 @@ export default class App extends React.Component{
   createCanvas(){
     let canvas = (
       <Canvas
-        ref={(canvas)=>{this.canvases.push(canvas)}}
+        ref={(c)=>{return c;}}
         width={this.canvasWidth.current.value || window.innerWidth/4*3}
         height={this.canvasHeight.current.value || window.innerWidth/4*3}
         assets={this.assets}
         ></Canvas>
     )
+    this.canvases.push(canvas)
 
     this.refreshCanvas()
   }

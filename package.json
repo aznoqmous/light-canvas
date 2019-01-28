@@ -30,7 +30,8 @@
     "start": "npm run develop",
     "format": "prettier --write \"src/**/*.js\"",
     "test": "echo \"Write tests! -> https://gatsby.app/unit-testing\"",
-    "build:sass": "node-sass src/css/scss/main.scss src/components/layout.css --output-style compressed"
+    "build:sass": "node-sass src/scss/main.scss src/components/layout.css --output-style compressed",
+    "watch:sass": "watch \"npm run build:sass\" src/scss"
   },
   "devDependencies": {
     "prettier": "^1.15.2"
