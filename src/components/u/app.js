@@ -22,13 +22,13 @@ export default class App extends React.Component{
     return (
       <div className="uidentity-app">
         <div className="settings">
-          <div className="file-settings">
+          <div className="form-group file-settings">
             <input type="file" multiple onChange={(e)=>{ this.handleChange(e.target.files) }} ref={this.input}/>
           </div>
-          <div className="canvas-settings">
+          <div className="form-group canvas-settings">
             <input type="number" min="0" step="100" ref={this.canvasWidth}/>
             <input type="number" min="0" step="100" ref={this.canvasHeight}/>
-            <button onClick={()=>{ this.createCanvas() }}>new frame</button>
+            <button className="btn btn-success" onClick={()=>{ this.createCanvas() }}>new frame</button>
           </div>
         </div>
         <div className="workspace">
@@ -43,8 +43,8 @@ export default class App extends React.Component{
                 <figure className="uidentity-canvas" key={i}>
                 {canvas}
                 <div className="canvas-toolbox">
-                  <span className="delete" onClick={()=>{this.handleDeleteCanvas(i)}}>delete</span>
-                  <span className="export" onClick={()=>{this.handleExportCanvas(i)}}>export</span>
+                  <button className="btn btn-danger delete" onClick={()=>{this.handleDeleteCanvas(i)}}>delete</button>
+                  <button className="btn btn-light export" onClick={()=>{this.handleExportCanvas(i)}}>export</button>
                 </div>
                 </figure>)
              })}

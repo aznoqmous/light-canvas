@@ -6,17 +6,18 @@ export default class Canvas extends React.Component {
 
     this.state = {
       assets: [],
-      scaleMin: 0.1,
-      scaleMax: 0.2,
+      scale: 0.1,
+      border: 0,
       width: this.props.width,
       height: this.props.height,
       refresh: true,
-      classes: ['canvas']
+      classes: ['canvas'],
+      loading: false
     }
-
-    this.canvas = React.createRef();
-    this.assets = [];
-    this.classes = ['canvas'];
+    this.canvas = React.createRef()
+    this.assets = []
+    this.modifier = 1
+    this.classes = ['canvas']
 
   }
 
@@ -29,10 +30,10 @@ export default class Canvas extends React.Component {
         ref={this.canvas}>
         {this.props.children}
         </canvas>
-        <input name="min" type="number" step="0.01" min="0" max="1" value={this.state.scaleMin} onChange={(e)=>{this.handleScaleChange(e, 'min')}}/>
-        <input name="max" type="number" step="0.01" min="0" max="1" value={this.state.scaleMax} onChange={(e)=>{this.handleScaleChange(e, 'max')}}/>
-        <span className="canvas-refresh" onClick={(e)=>{this.handleRefresh()}}>refresh</span>
-        <span className="canvas-add" onClick={(e)=>{this.handleAdd()}}>add</span>
+        <input name="scale" type="number" step="0.01" min="0" max="1" value={this.state.scale} onChange={(e)=>{this.handleScaleChange(e, 'scale')}}/>
+        <input name="border" type="number" value={this.state.border} onChange={(e)=>{this.handleScaleChange(e, 'border')}}/>
+        <button className="btn btn-light canvas-refresh" onClick={(e)=>{this.handleRefresh()}}>refresh</button>
+        <button className="btn btn-light canvas-add" onClick={(e)=>{this.handleAdd()}}>add</button>
       </div>
     )
   }
@@ -62,7 +63,7 @@ export default class Canvas extends React.Component {
     });
   }
   drawAsset(asset){
-    this.ctx.drawImage(asset, asset.left, asset.top, asset.width, asset.height);
+    this.ctx.drawImage(asset, asset.drawLeft, asset.drawTop, asset.drawWidth, asset.drawHeight);
   }
 
   initAssets(){
@@ -76,43 +77,57 @@ export default class Canvas extends React.Component {
 
       newImg.onload = (e)=>{
         completed++;
-        console.log(completed, this.props.assets.length);
+        this.afterInitAsset(newImg)
+
         if(completed >= this.props.assets.length - 1) {
-          this.classRemove('loading');
+          this.classRemove('loading')
+          this.setState({assets: this.assets})
         }
-        this.findRandomCanvasPosition(newImg);
-        this.assets.push(newImg);
-        this.setState({assets: this.assets});
+
       }
 
     })
   }
-  findRandomCanvasPosition(asset){
-    let ratio = asset.width / asset.height
-    let tries = 0;
-
-    while(1){
-      if(tries >= 2000) return false;
-      tries++;
-      let width = ( Math.random() * (this.state.scaleMax - this.state.scaleMin) + this.state.scaleMin ) * this.pxRef;
-      let height = width / ratio;
-      let rand = {
-        width: width,
-        height: height,
-        left: Math.random() * ( this.c.width - width ),
-        top: Math.random() * ( this.c.height - height ),
-      }
-
-      for(let a of this.assets){
-        if( this.checkColl(a, rand) ) return true;
-      }
-
-      asset = Object.assign(asset, rand);
-      return false;
-    }
+  afterInitAsset(newImg){
+    this.assets.push(newImg)
+    this.findRandomCanvasPosition(newImg)
   }
 
+  findRandomCanvasPosition(asset){
+    this.tries = 0
+    this.ratio = asset.width / asset.height
+    this.borders = 10;
+    this.loop(this, asset)
+  }
 
+  loop(self, asset){
+    self.tries++;
+    let width =  self.modifier * self.pxRef * self.state.scale;
+    // let width =  this.modifier * ( Math.random() * (self.state.scaleMax - self.state.scaleMin) + self.state.scaleMin ) * self.pxRef
+    let height = self.modifier * width / self.ratio
+
+    let left =   Math.random() * ( self.c.width - width );
+    let top =  Math.random() * ( self.c.height - height );
+    let rand = {
+      drawWidth: width,
+      drawHeight: height,
+      drawLeft: left,
+      drawTop: top,
+
+      width: width + self.borders * 2,
+      height: height + self.borders * 2,
+      left: left - self.borders,
+      top: top - self.borders,
+    }
+
+    for(let a of self.assets){
+      if( self.checkColl(a, rand) ){
+        if( self.tries < 1000 ) window.requestAnimationFrame(function(){self.loop(self, asset)})
+        return false;
+      }
+    }
+    asset = Object.assign(asset, rand)
+  }
 
 
   checkColl(a, b){
@@ -131,24 +146,18 @@ export default class Canvas extends React.Component {
   }
 
   handleScaleChange(e, scale){
-    if(scale == 'min') this.setState({scaleMin: parseFloat(e.target.value)});
-    else this.setState({scaleMax: parseFloat(e.target.value)});
-    this.assets = [];
-    this.initAssets();
+    if(scale == 'scale') this.setState({scale: parseFloat(e.target.value)});
+    if(scale == 'border') this.setState({border: parseFloat(e.target.value)});
   }
   handleRefresh(){
-
     this.clear();
     this.assets = [];
     this.initAssets();
-
-    // this.draw(this.assets);
   }
   handleAdd(){
-
     this.initAssets();
-
   }
+
   classAdd(className){
     for(let c of this.classes){
       if(c == className) return false;
@@ -164,6 +173,5 @@ export default class Canvas extends React.Component {
     }
     this.setState({classes: this.classes})
   }
-
 
 }
