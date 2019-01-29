@@ -14,6 +14,28 @@ export default class Canvas extends React.Component {
       classes: ['canvas'],
       loading: false
     }
+
+    let cw = 200;
+    let ch = 200;
+    this.canvasScale = ( this.props.width > this.props.height )? cw / this.props.width: ch / this.props.height;
+
+    this.canvasStyle = {
+      position: 'absolute',
+      left:  (cw / 2 - this.props.width / 2) + 'px' ,
+      top:  (ch / 2 - this.props.height / 2) + 'px' ,
+      transform: 'scale(' + this.canvasScale + ')'
+    }
+    console.log(this.canvasStyle);
+
+    this.canvasHolderStyle = {
+      position: 'relative',
+      width: cw + 'px',
+      height: ch + 'px',
+      overflow: 'hidden',
+      border: '1px solid black'
+    }
+
+
     this.canvas = React.createRef()
     this.assets = []
     this.modifier = 1
@@ -24,12 +46,16 @@ export default class Canvas extends React.Component {
   render(){
     return (
       <div className="canvas-container">
-        <canvas className={this.state.classes.join(' ')}
-        width={this.props.width}
-        height={this.props.height}
-        ref={this.canvas}>
-        {this.props.children}
-        </canvas>
+        <div className="canvas-holder" style={this.canvasHolderStyle}>
+          <canvas className={this.state.classes.join(' ')}
+          width={this.props.width}
+          height={this.props.height}
+          ref={this.canvas}
+          style={this.canvasStyle}
+          >
+          {this.props.children}
+          </canvas>
+        </div>
         <input name="scale" type="number" step="0.01" min="0" max="1" value={this.state.scale} onChange={(e)=>{this.handleScaleChange(e, 'scale')}}/>
         <input name="border" type="number" value={this.state.border} onChange={(e)=>{this.handleScaleChange(e, 'border')}}/>
         <button className="btn btn-light canvas-refresh" onClick={(e)=>{this.handleRefresh()}}>refresh</button>
