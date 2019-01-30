@@ -6,13 +6,15 @@ export default class Asset extends React.Component{
     super(props)
 
     this.state = {
-      selected: false
+      selected: false,
+      loaded: false,
     }
+    this.img = React.createRef();
   }
 
   render(){
     return (
-        <img src={this.props.src} alt="asset"/>
+        <img ref={this.img} src={this.props.src} alt="asset"/>
     )
   }
 

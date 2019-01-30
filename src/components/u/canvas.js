@@ -25,14 +25,12 @@ export default class Canvas extends React.Component {
       top:  (ch / 2 - this.props.height / 2) + 'px' ,
       transform: 'scale(' + this.canvasScale + ')'
     }
-    console.log(this.canvasStyle);
 
     this.canvasHolderStyle = {
       position: 'relative',
       width: cw + 'px',
       height: ch + 'px',
-      overflow: 'hidden',
-      border: '1px solid black'
+      overflow: 'hidden'
     }
 
 
@@ -65,13 +63,51 @@ export default class Canvas extends React.Component {
   }
 
   componentDidMount(){
+
+    this.init();
+    this.initAssets();
+
+  }
+  init(){
     this.c = this.canvas.current;
     this.ctx = this.c.getContext('2d');
     this.clear();
 
-    this.pxRef = ( this.c.width < this.c.height )? this.c.width : this.c.height ;
+    this.pxRef = ( this.c.width < this.c.height )? this.c.width : this.c.height;
+  }
+  initAssets(){
+    this.classAdd('loading');
+    this.completed = 0;
+    this.props.assets.map((asset)=>{
+      this.loadAsset(asset)
+    })
+  }
+  loadAsset(asset){
+    var img = new Image();
+    img.src = asset.props.src;
 
-    this.initAssets();
+    img.onload = (e)=>{
+
+      this.completed++;
+      this.afterLoadAsset(img)
+      this.setState({assets: this.assets})
+      if(this.completed >= this.props.assets.length - 1) {
+        this.classRemove('loading')
+      }
+
+    }
+
+  }
+  afterLoadAsset(img){
+    this.assets.push(img)
+    this.findRandomCanvasPosition(img)
+  }
+  getAssetImg(asset){
+    let res = false
+    this.assets.map((img)=>{
+      if(JSON.stringify(img.src) == JSON.stringify(asset.props.src)) res = img;
+    })
+    return res
   }
 
   componentDidUpdate(){
@@ -90,33 +126,6 @@ export default class Canvas extends React.Component {
   }
   drawAsset(asset){
     this.ctx.drawImage(asset, asset.drawLeft, asset.drawTop, asset.drawWidth, asset.drawHeight);
-  }
-
-  initAssets(){
-    this.classAdd('loading');
-    var completed = 0;
-
-    this.props.assets.map((asset)=>{
-
-      let newImg = new Image();
-      newImg.src = asset.props.src;
-
-      newImg.onload = (e)=>{
-        completed++;
-        this.afterInitAsset(newImg)
-
-        if(completed >= this.props.assets.length - 1) {
-          this.classRemove('loading')
-          this.setState({assets: this.assets})
-        }
-
-      }
-
-    })
-  }
-  afterInitAsset(newImg){
-    this.assets.push(newImg)
-    this.findRandomCanvasPosition(newImg)
   }
 
   findRandomCanvasPosition(asset){
@@ -155,7 +164,6 @@ export default class Canvas extends React.Component {
     asset = Object.assign(asset, rand)
   }
 
-
   checkColl(a, b){
     if(
       (
@@ -178,7 +186,6 @@ export default class Canvas extends React.Component {
   handleRefresh(){
     this.clear();
     this.assets = [];
-    this.initAssets();
   }
   handleAdd(){
     this.initAssets();

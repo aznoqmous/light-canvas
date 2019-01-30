@@ -24,17 +24,83 @@ canvas{
 .assets{
   display: flex;
   flex-wrap: wrap;
-  figure{
-    height: 20px;
-    width: 20px;
-    margin: 10px;
+  margin-bottom: 2.5rem;
+
+  figure.asset{
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 3rem;
+    width: 3rem;
+
+    border-radius: 50%;
+    padding: 1rem;
+
+    &:hover{
+      background: #eee;
+      img{
+        transform: scale(1.1)
+      }
+      .asset-toolbox{
+        opacity: 1;
+        pointer-events: all;
+        top: 100%;
+      }
+    }
+
+    .asset-toolbox{
+      // transform: translate(-50%, 0);
+      position:absolute;
+      z-index: 10;
+      display: flex;
+      top: 0;
+      left: -0.5rem;
+
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+
+      i.fa{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 2rem;
+        width: 2rem;
+        padding: 0.5rem;
+        background: #eee;
+        border-radius: 50%;
+        transform: scale(1);
+        transition: all 0.2s ease;
+        &:hover{
+          transform: scale(1);
+        }
+
+        &.fa-star{
+          color: #ffc107;
+          &:hover{
+            background: #ffc107;
+            color: white;
+          }
+        }
+        &.fa-times{
+          color: #dc3545;
+          &:hover{
+            background: #dc3545;
+            color: white;
+          }
+        }
+
+
+      }
+    }
+
     img {
       height: 100%;
       width: auto;
       transition: all 0.2s ease-out;
-      &:hover{
-        transform: scale(1.1);
-      }
     }
   }
 }

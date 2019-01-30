@@ -7,15 +7,16 @@ export default class App extends React.Component{
   constructor(props){
     super(props)
     this.state = {
-      assets: []
+      assets: [],
+      canvases: []
     }
-    this.assets = [];
-    this.canvases = [];
+    this.assets = []
+    this.canvases = []
 
-    this.canvasWidth = React.createRef();
-    this.canvasHeight = React.createRef();
+    this.canvasWidth = React.createRef()
+    this.canvasHeight = React.createRef()
 
-    this.input = React.createRef();
+    this.input = React.createRef()
   }
 
   render(){
@@ -34,7 +35,16 @@ export default class App extends React.Component{
         <div className="workspace">
           <div className="assets">
             {this.assets.map((asset, i)=>{
-              return <figure key={i} onClick={()=>{this.handleDeleteAsset(i)}}>{asset}</figure>
+              return (
+                <figure className="asset"
+                key={i}>
+                <div className="asset-toolbox">
+                  <i className="fa fa-star"></i>
+                  <i className="fa fa-times" onClick={()=>{this.handleDeleteAsset(i)}}></i>
+                </div>
+                {asset}
+                </figure>
+              )
              })}
           </div>
           <div className="canvases">
@@ -59,18 +69,19 @@ export default class App extends React.Component{
     for(let file of files){
       this.createAsset( file )
     }
-    this.input.current.value = "";
+    this.input.current.value = ""
   }
   handleDeleteAsset(index){
-    this.assets.splice(index, 1);
-    this.refreshAssets();
+    this.assets.splice(index, 1)
+    this.refreshAssets()
   }
   handleDeleteCanvas(index){
-    this.canvases.splice(index, 1);
-    this.refreshCanvas();
+    console.log(index)
+    this.canvases = this.canvases.splice(index, 1)
+    this.refreshCanvas()
   }
   handleExportCanvas(index){
-    let canvas = this.canvases[index];
+    let canvas = this.canvases[index]
   }
 
   createAsset(file){
@@ -78,13 +89,13 @@ export default class App extends React.Component{
     reader.onload = (e) => {
       this.assets.push( <Asset src={e.target.result}/> )
       this.refreshAssets()
-    };
+    }
     reader.readAsDataURL(file)
   }
   createCanvas(){
     let canvas = (
       <Canvas
-        ref={(c)=>{return c;}}
+        ref={(c)=>{return c}}
         width={this.canvasWidth.current.value || window.outerWidth}
         height={this.canvasHeight.current.value || window.outerHeight}
         assets={this.assets}
